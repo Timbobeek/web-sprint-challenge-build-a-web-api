@@ -4,7 +4,7 @@ const router = require("express").Router();
 
 //-----------------------GET--------------------------------------
 
-router.get("/", (req, res) => {
+router.get("/", (req, res, next) => {
   Project.get()
     .then((projects) => {
       if (!projects) {
@@ -13,12 +13,7 @@ router.get("/", (req, res) => {
         res.status(200).json(projects);
       }
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({
-        message: "The projects information could not be retrieved",
-      });
-    });
+    .catch(next);
 });
 
 router.get("/:id", (req, res) => {
@@ -34,7 +29,7 @@ router.get("/:id", (req, res) => {
     })
     .catch((err) => {
       res.status(500).json({
-        message: "The post information could not be retrieved",
+        message: "The project information could not be retrieved",
         error: err.message,
       });
     });
@@ -46,7 +41,7 @@ router.post("/", (req, res) => {
   const { description, name, completed } = req.body;
   if (!description || !name) {
     res.status(400).json({
-      message: "Please provide all of the info for the post",
+      message: "Please provide all of the info for the project",
     });
   } else {
     Project.insert({ description, name, completed })
@@ -72,7 +67,7 @@ router.put("/:id", (req, res) => {
   const { description, name, completed } = req.body;
   if (!description || !name || completed === undefined) {
     res.status(400).json({
-      message: "Please provide description, name, and completion for the post",
+      message: "Please provide description, name, and completion for the project",
     });
   } else {
     Project.get(req.params.id)
@@ -119,7 +114,7 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      message: "The post could not be removed",
+      message: "The project could not be removed",
     });
   }
 });
@@ -150,5 +145,16 @@ router.get("/:id/actions", (req, res) => {
       });
     });
 });
+
+
+router.use((err, req, res, next)=>{
+  res.status(err.status || 500).json({
+    custom: 'This info could not be retrieved!',
+    message: err.message,
+    stack: err.stack
+  })
+})
+
+
 
 module.exports = router;
