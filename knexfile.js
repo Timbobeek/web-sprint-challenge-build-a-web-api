@@ -18,7 +18,7 @@ module.exports = {
   development: {
     ...commonConfig,
     connection: {
-      filename: "./data/database.db3",
+      filename: "./data/test.db3",
     },
   },
   testing: {
