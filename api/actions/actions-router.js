@@ -1,26 +1,24 @@
-const Action = require('../actions/actions-model');
+const Action = require("../actions/actions-model");
 
-const router = require('express').Router()
+const router = require("express").Router();
+
+const errorMiddleware = require("./actions-middleware");
 
 //-----------------------GET--------------------------------------
 
-router.get('/', (req, res) => {
+router.get("/", (req, res, next) => {
   Action.get()
-    .then(actions => {
-      if(!actions) {
+    .then((actions) => {
+      if (!actions) {
         res.status(200).json([]);
       } else {
-        res.status(200).json(actions);}
+        res.status(200).json(actions);
+      }
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        message: "The actions information could not be retrieved",
-      })
-    })
-})
+    .catch(next);
+});
 
-router.get("/:id", (req, res) => {
+router.get("/:id", (req, res, next) => {
   Action.get(req.params.id)
     .then((action) => {
       if (!action) {
@@ -31,17 +29,12 @@ router.get("/:id", (req, res) => {
         res.status(200).json(action);
       }
     })
-    .catch((err) => {
-      res.status(500).json({
-        message: "The action information could not be retrieved",
-        error: err.message,
-      });
-    });
+    .catch(next);
 });
 
 //----------------------POST-------------------------
 
-router.post("/", (req, res) => {
+router.post("/", (req, res, next) => {
   const { project_id, description, notes } = req.body;
   if (!project_id || !description || !notes) {
     res.status(400).json({
@@ -55,21 +48,15 @@ router.post("/", (req, res) => {
       .then((newAction) => {
         res.status(201).json(newAction);
       })
-      .catch((err) => {
-        res.status(500).json({
-          message:
-            "There was an error while saving the action to the database",
-          error: err.message,
-        });
-      });
+      .catch(next);
   }
 });
 
 //------------------------PUT-------------------------------
 
-router.put("/:id", (req, res) => {
+router.put("/:id", (req, res, next) => {
   const { project_id, description, notes } = req.body;
-  if (!project_id || !description || !notes ) {
+  if (!project_id || !description || !notes) {
     res.status(400).json({
       message: "Please provide all of the info for the action",
     });
@@ -92,19 +79,13 @@ router.put("/:id", (req, res) => {
       .then((action) => {
         res.status(201).json(action);
       })
-      .catch((err) => {
-        res.status(500).json({
-          message:
-            "There was an error while saving the action to the database",
-          error: err.message,
-        });
-      });
+      .catch(next);
   }
 });
 
 //----------------------DELETE--------------------------
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const action = await Action.get(req.params.id);
     if (!action) {
@@ -116,11 +97,10 @@ router.delete("/:id", async (req, res) => {
       res.status(201).json();
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "The action could not be removed",
-    });
+    next(error);
   }
 });
+
+router.use(errorMiddleware);
 
 module.exports = router;

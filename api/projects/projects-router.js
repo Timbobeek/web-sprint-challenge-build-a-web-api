@@ -2,6 +2,8 @@ const Project = require("../projects/projects-model");
 
 const router = require("express").Router();
 
+const errorMiddleware = require("./projects-middleware");
+
 //-----------------------GET--------------------------------------
 
 router.get("/", (req, res, next) => {
@@ -16,7 +18,7 @@ router.get("/", (req, res, next) => {
     .catch(next);
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", (req, res, next) => {
   Project.get(req.params.id)
     .then((project) => {
       if (!project) {
@@ -27,17 +29,12 @@ router.get("/:id", (req, res) => {
         res.status(200).json(project);
       }
     })
-    .catch((err) => {
-      res.status(500).json({
-        message: "The project information could not be retrieved",
-        error: err.message,
-      });
-    });
+    .catch(next);
 });
 
 //-----------------------POST--------------------------------------
 
-router.post("/", (req, res) => {
+router.post("/", (req, res, next) => {
   const { description, name, completed } = req.body;
   if (!description || !name) {
     res.status(400).json({
@@ -51,23 +48,18 @@ router.post("/", (req, res) => {
       .then((newProject) => {
         res.status(201).json(newProject);
       })
-      .catch((err) => {
-        res.status(500).json({
-          message:
-            "There was an error while saving the project to the database",
-          error: err.message,
-        });
-      });
+      .catch(next);
   }
 });
 
 //---------------------------PUT--------------------------------
 
-router.put("/:id", (req, res) => {
+router.put("/:id", (req, res, next) => {
   const { description, name, completed } = req.body;
   if (!description || !name || completed === undefined) {
     res.status(400).json({
-      message: "Please provide description, name, and completion for the project",
+      message:
+        "Please provide description, name, and completion for the project",
     });
   } else {
     Project.get(req.params.id)
@@ -88,19 +80,13 @@ router.put("/:id", (req, res) => {
       .then((project) => {
         res.status(201).json(project);
       })
-      .catch((err) => {
-        res.status(500).json({
-          message:
-            "There was an error while saving the project to the database",
-          error: err.message,
-        });
-      });
+      .catch(next);
   }
 });
 
 //--------------------------DELETE-----------------------------------
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const project = await Project.get(req.params.id);
     if (!project) {
@@ -112,49 +98,29 @@ router.delete("/:id", async (req, res) => {
       res.status(201).json();
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "The project could not be removed",
-    });
+    next(error);
   }
 });
 
 //--------------------------GET w/actions-------------------------------
 
-router.get("/:id/actions", (req, res) => {
+router.get("/:id/actions", (req, res, next) => {
   Project.get(req.params.id)
     .then((project) => {
       if (!project) {
-        res
-          .status(404)
-          .json({
-            message: "The project with the specified ID does not exist",
-          });
-      }
-      else {
-        return Project.getProjectActions(req.params.id)
+        res.status(404).json({
+          message: "The project with the specified ID does not exist",
+        });
+      } else {
+        return Project.getProjectActions(req.params.id);
       }
     })
-    .then(actions =>{
-      res.status(200).json(actions)
+    .then((actions) => {
+      res.status(200).json(actions);
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).json({
-        message: "The actions information could not be retrieved",
-      });
-    });
+    .catch(next);
 });
 
-
-router.use((err, req, res, next)=>{
-  res.status(err.status || 500).json({
-    custom: 'This info could not be retrieved!',
-    message: err.message,
-    stack: err.stack
-  })
-})
-
-
+router.use(errorMiddleware);
 
 module.exports = router;
