@@ -1,4 +1,5 @@
 const Action = require("../actions/actions-model");
+const Project = require("../projects/projects-model");
 
 const router = require("express").Router();
 
@@ -41,7 +42,16 @@ router.post("/", (req, res, next) => {
       message: "Please provide all of the info for the action",
     });
   } else {
-    Action.insert({ project_id, description, notes })
+    Project.get(project_id)
+      .then((project) => {
+        if (!project) {
+          res.status(404).json({
+            message: "The project with the specified ID does not exist",
+          });
+        } else {
+          return Action.insert({ project_id, description, notes });
+        }
+      })
       .then(({ id }) => {
         return Action.get(id);
       })
