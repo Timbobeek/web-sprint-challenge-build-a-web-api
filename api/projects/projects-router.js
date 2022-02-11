@@ -5,12 +5,13 @@ const router = require('express').Router()
 //-----------------------GET--------------------------------------
 
 router.get('/', (req, res) => {
-  Project.get(req.body)
+  Project.get()
     .then(projects => {
       if(!projects) {
-        res.json([])
-      }
+        res.status(200).json([])
+      } else {
       res.status(200).json(projects);
+      }
     })
     .catch(err => {
       console.log(err);
@@ -21,14 +22,14 @@ router.get('/', (req, res) => {
 })
 
 router.get('/:id', (req, res) => {
-  Project.get(req.id)
+  Project.get(req.params.id)
     .then(project => {
       if (!project) {
           res.status(404).json({
             message: "The project with the specified ID does not exist"
           })
-        }
-        res.status(200).json(project)
+        } else {
+        res.status(200).json(project)}
     })
     .catch(err => {
       res.status(500).json({
