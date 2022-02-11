@@ -139,6 +139,7 @@ describe('server.js', () => {
     describe('[GET] /api/projects/:id/actions', () => {
       test('[13] sends back the actions in project with given id', async () => {
         const res = await request(server).get('/api/projects/1/actions')
+        console.log(res.body)
         expect(res.body).toMatchObject(actions)
       }, 750)
       test('[14] sends back empty array if no actions in project with given id', async () => {
