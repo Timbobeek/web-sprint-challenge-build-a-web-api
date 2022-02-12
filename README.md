@@ -147,7 +147,43 @@ We have provided test data for all the resources.
 Be prepared to demonstrate your understanding of this week's concepts by answering questions on the following topics. You might prepare by writing down your own answers before hand.
 
 1. The core features of Node.js and Express and why they are useful.
-1. Understand and explain the use of Middleware.
-1. The basic principles of the REST architectural style.
-1. Understand and explain the use of Express Routers.
-1. Describe tooling used to manually test the correctness of an API.
+
+Node.js:
+
+-Node.js uses the same programming language (JavaScript) and paradigm for both client and server. Using the same language, we minimize context switching and share code between the client and the server.
+
+-JavaScript is single-threaded, which removes the complexity involved in handling multiple threads.
+
+-JavaScript is asynchronous, which allows us to take full advantage of the processor it's running on. Taking full advantage of the processor is crucial because the node process will be running on a single CPU.
+
+-Using JavaScript gives us access to the npm repository. This repository is the largest ecosystem of valuable libraries (most free to use) in npm modules.
+
+Express:
+
+-Middleware: saves from writing too much abundant code, middleware functions can get the request and response objects, operate on them, and (when specified) trigger some action.
+
+-Routing: routing is a way to select which request handler function is executed. It does so based on the URL visited and the HTTP method used. Thus, routing provides a way to break an application into smaller parts.
+
+-Convenience helpers: Express has many helpers that provide out-of-the-box functionality to make writing web applications and API servers easier
+
+
+2. Understand and explain the use of Middleware.
+
+Middleware is software that lies between an operating system and the applications running on it. Essentially functioning as hidden translation layer, middleware enables communication and data management for distributed applications. It’s sometimes called plumbing, as it connects two applications together so data and databases can be easily passed between the “pipe.” Using middleware allows users to perform such requests as submitting forms on a web browser, or allowing the web server to return dynamic web pages based on a user’s profile.
+
+3. The basic principles of the REST architectural style.
+
+Everything is a resource.
+Each resource is accessible via a unique URI.
+Resources can have multiple representations.
+Communication happens over a stateless protocol (HTTP).
+Resource management happens via HTTP methods
+
+4. Understand and explain the use of Express Routers.
+
+An Express Router behaves like a mini Express application. It can have its own Routing and Middleware, but it needs to exist inside an Express application. Routers is a way of organizing Express applications–you write separate pieces that can later be composed together.
+
+
+5. Describe tooling used to manually test the correctness of an API.
+
+Tools such as Postman or HTTPie can be used for this. In Postman, you choose the verb from the dropdown, enter the route, and below, fill out the body if needed. Response will show up in the window below. HTTPie allows you to do all of this in the terminal by typing 'http', the verb, and the route, followed by the body if needed. On enter, if the  test server is running, the response will appear below.
